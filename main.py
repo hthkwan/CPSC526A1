@@ -12,9 +12,12 @@ def pwd_com():
     resp = os.getcwd()
     return (resp+"\n")
 
+
 def cd_com(relPath):
     cwd=os.getcwd()
-    path=os.path.join(cwd,relPath)
+    path=os.chdir(os.path.join(cwd,relPath))
+    return("dir changed"+"\n")
+
 
 def hlp_com():
     return ("pwd - returns current working directory\ncd <dir> - changes currentworking directory to <dir>\n"
@@ -44,17 +47,26 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
            if len(data) == 0:
                break
            data = data.decode( "utf-8")
+           dir = ""
+           try:
+               data,dir=data.split(" ")
+               dir=dir.rstrip('\n')
+           except ValueError:
+               print("\n")
+
 
            option = {'ls\n': ls_com,
                      'pwd\n': pwd_com,
                      'help\n': hlp_com,
                      'who\n':who_com,
                      'ps\n':ps_com,
-                     'off\n':off_com}
+                     'off\n':off_com,
+                     'cd':cd_com}
 
-           response = option[data]()
-
-
+           if dir:
+            response = option[data](dir)
+           else:
+            response = option[data]()
 
            self.request.sendall(bytearray(response,"UTF-8"))
            print("%s (%s) wrote: %s" % (self.client_address[0],
