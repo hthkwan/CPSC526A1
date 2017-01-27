@@ -3,7 +3,7 @@ import socketserver
 import socket, threading
 import subprocess
 
-password = "password"
+password = "password\n"
 passwordRequest = "Please enter the password\n"
 incorrectPw = "Incorrect password\n"
 welcome = "Welcome back!\n"
@@ -24,8 +24,9 @@ def pwd_com():
 #assumed that the path is relative
 def cd_com(relPath):
     cwd=os.getcwd()
-    path=os.chdir(os.path.join(cwd,relPath))
-    return("dir changed\n")
+    path=os.path.join(cwd,relPath)
+    os.chdir(path)
+    return("dir changed to "+path+"\n")
 
 def hlp_com():
     return ("pwd - returns current working directory\ncd <dir> - changes currentworking directory to <dir>\n"
@@ -114,9 +115,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
            # response = option[data]()
 
            self.request.sendall(bytearray(response,"UTF-8"))
-           #print("%s (%s) wrote: %s" % (self.client_address[0],
-           #      threading.currentThread().getName(), data.strip()))
-           print(response)
+           print("%s (%s) wrote: %s" % (self.client_address[0],
+                threading.currentThread().getName(), data.strip()))
+           #print(response)
            if(response=="client disconnect\n"):
                print("bye")
                break
