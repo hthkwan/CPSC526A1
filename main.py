@@ -3,6 +3,11 @@ import socketserver
 import socket, threading
 import subprocess
 
+password = "password"
+passwordRequest = "Please enter the password"
+incorrectPw = "Incorrect password"
+welcome = "Welcome back!"
+
 def cat_com(fileName):
     with open(fileName, "r") as myfile:
         data = myfile.readlines()
@@ -39,6 +44,9 @@ def off_com():
 class MyTCPHandler(socketserver.BaseRequestHandler):
    BUFFER_SIZE = 4096
    def handle(self):
+       authorized = False
+       self.request.sendall(bytearray(passwordRequest, "UTF-8"))
+
        while 1:
            data = self.request.recv(self.BUFFER_SIZE)
            if len(data) == self.BUFFER_SIZE:
@@ -50,32 +58,66 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
            #add the password here
 
            if len(data) == 0:
-               break
+               continue
            data = data.decode( "utf-8")
-           dir = ""
-           try:
-               data,dir=data.split(" ")
-               dir=dir.rstrip('\n')
-           except ValueError:
-               print("\n")
 
-           option = {'ls\n': ls_com,
-                     'pwd\n': pwd_com,
-                     'help\n': hlp_com,
-                     'who\n':who_com,
-                     'ps\n':ps_com,
-                     'off\n':off_com,
-                     'cd':cd_com,
-                     'cat':cat_com}
+           if not authorized:
+               authorized = data is password
+               if not authorized:
+                   self.request.sendall(bytearray(incorrectPw, "UTF-8"))
+                   continue
+               else:
+                   self.request.sendall(bytearray(welcome, "UTF-8"))
+                   continue
 
-           if dir:
-            response = option[data](dir)
+
+           # experimental method of getting arguments for the time being
+           command = data.split()  # splits on space and \n
+
+           if data.startswith('ls'):
+               response = ls_com()
+           elif data.startswith('pwd'):
+               response = pwd_com()
+           elif data.startswith('help'):
+               response = hlp_com()
+           elif data.startswith('who'):
+               response = who_com()
+           elif data.startswith('ps'):
+               response = ps_com()
+           elif data.startswith('off'):
+               response = off_com()
+           elif data.startswith('cd'):
+               response = cd_com(command[1])
+           elif data.startswith('cat'):
+               response = cat_com(command[1])
            else:
-            response = option[data]()
+               response = "command not found"
+
+           #dir = ""
+           #try:
+           #    data,dir=data.split(" ")
+           #    dir=dir.rstrip('\n')
+           #except ValueError:
+           #    print("\n")
+
+           #option = {'ls\n': ls_com,
+           #          'pwd\n': pwd_com,
+           #          'help\n': hlp_com,
+           #          'who\n':who_com,
+           #          'ps\n':ps_com,
+           #          'off\n':off_com,
+           #          'cd':cd_com,
+           #          'cat':cat_com}
+
+           #if dir:
+           # response = option[data](dir)
+           #else:
+           # response = option[data]()
 
            self.request.sendall(bytearray(response,"UTF-8"))
-           print("%s (%s) wrote: %s" % (self.client_address[0],
-                 threading.currentThread().getName(), data.strip()))
+           #print("%s (%s) wrote: %s" % (self.client_address[0],
+           #      threading.currentThread().getName(), data.strip()))
+           print(response)
            if(response=="client disconnect"):
                self.request.close()
                break
