@@ -4,9 +4,9 @@ import socket, threading
 import subprocess
 
 password = "password"
-passwordRequest = "Please enter the password"
-incorrectPw = "Incorrect password"
-welcome = "Welcome back!"
+passwordRequest = "Please enter the password\n"
+incorrectPw = "Incorrect password\n"
+welcome = "Welcome back!\n"
 
 def cat_com(fileName):
     with open(fileName, "r") as myfile:
@@ -25,7 +25,7 @@ def pwd_com():
 def cd_com(relPath):
     cwd=os.getcwd()
     path=os.chdir(os.path.join(cwd,relPath))
-    return("dir changed"+"\n")
+    return("dir changed\n")
 
 def hlp_com():
     return ("pwd - returns current working directory\ncd <dir> - changes currentworking directory to <dir>\n"
@@ -39,11 +39,12 @@ def ps_com():
     return (subprocess.check_output(["/bin/ps"]).decode("utf-8"))
 
 def off_com():
-    return ("client disconnect")
+    return ("client disconnect\n")
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
    BUFFER_SIZE = 4096
    def handle(self):
+       print("hi")
        authorized = False
        self.request.sendall(bytearray(passwordRequest, "UTF-8"))
 
@@ -55,23 +56,21 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                        data += self.request.recv(self.BUFFER_SIZE, socket.MSG_DONTWAIT)
                    except:
                        break
-           #add the password here
 
            if len(data) == 0:
                continue
            data = data.decode( "utf-8")
 
            if not authorized:
-               authorized = data is password
+               authorized = (data == password)
                if not authorized:
+                   print(data)
                    self.request.sendall(bytearray(incorrectPw, "UTF-8"))
                    continue
                else:
                    self.request.sendall(bytearray(welcome, "UTF-8"))
                    continue
 
-
-           # experimental method of getting arguments for the time being
            command = data.split()  # splits on space and \n
 
            if data.startswith('ls'):
@@ -91,7 +90,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
            elif data.startswith('cat'):
                response = cat_com(command[1])
            else:
-               response = "command not found"
+               response = "command not found\n"
 
            #dir = ""
            #try:
@@ -118,8 +117,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
            #print("%s (%s) wrote: %s" % (self.client_address[0],
            #      threading.currentThread().getName(), data.strip()))
            print(response)
-           if(response=="client disconnect"):
-               self.request.close()
+           if(response=="client disconnect\n"):
+               print("bye")
                break
 
 
