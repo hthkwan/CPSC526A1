@@ -9,9 +9,12 @@ incorrectPw = "Incorrect password\n"
 welcome = "Welcome back!\n"
 
 def cat_com(fileName):
-    with open(fileName, "r") as myfile:
-        data = myfile.readlines()
-    return("\n".join(data)+"\n")
+    try:
+        with open(fileName, "r") as myfile:
+            data = myfile.readlines()
+        return("\n".join(data)+"\n")
+    except:
+        return("No Such file\n")
 
 def ls_com():
     resp = os.listdir(os.getcwd())
@@ -25,8 +28,11 @@ def pwd_com():
 def cd_com(relPath):
     cwd=os.getcwd()
     path=os.path.join(cwd,relPath)
-    os.chdir(path)
-    return("dir changed to "+path+"\n")
+    try:
+        os.chdir(path)
+        return("dir changed to "+path+"\n")
+    except:
+        return("No such path "+path+"\n")
 
 def hlp_com():
     return ("pwd - returns current working directory\ncd <dir> - changes currentworking directory to <dir>\n"
@@ -72,47 +78,50 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                    self.request.sendall(bytearray(welcome, "UTF-8"))
                    continue
 
-           command = data.split()  # splits on space and \n
+           #command = data.split()  # splits on space and \n
 
-           if data.startswith('ls'):
-               response = ls_com()
-           elif data.startswith('pwd'):
-               response = pwd_com()
-           elif data.startswith('help'):
-               response = hlp_com()
-           elif data.startswith('who'):
-               response = who_com()
-           elif data.startswith('ps'):
-               response = ps_com()
-           elif data.startswith('off'):
-               response = off_com()
-           elif data.startswith('cd'):
-               response = cd_com(command[1])
-           elif data.startswith('cat'):
-               response = cat_com(command[1])
-           else:
-               response = "command not found\n"
+           # if data.startswith('ls'):
+           #     response = ls_com()
+           # elif data.startswith('pwd'):
+           #     response = pwd_com()
+           # elif data.startswith('help'):
+           #     response = hlp_com()
+           # elif data.startswith('who'):
+           #     response = who_com()
+           # elif data.startswith('ps'):
+           #     response = ps_com()
+           # elif data.startswith('off'):
+           #     response = off_com()
+           # elif data.startswith('cd'):
+           #     response = cd_com(command[1])
+           # elif data.startswith('cat'):
+           #     response = cat_com(command[1])
+           # else:
+           #     response = "command not found\n"
 
-           #dir = ""
-           #try:
-           #    data,dir=data.split(" ")
-           #    dir=dir.rstrip('\n')
-           #except ValueError:
-           #    print("\n")
+           dir = ""
+           try:
+              data,dir=data.split(" ")
+              dir=dir.rstrip('\n')
+           except ValueError:
+              print("\n")
 
-           #option = {'ls\n': ls_com,
-           #          'pwd\n': pwd_com,
-           #          'help\n': hlp_com,
-           #          'who\n':who_com,
-           #          'ps\n':ps_com,
-           #          'off\n':off_com,
-           #          'cd':cd_com,
-           #          'cat':cat_com}
+           option = {'ls\n': ls_com,
+                    'pwd\n': pwd_com,
+                    'help\n': hlp_com,
+                    'who\n':who_com,
+                    'ps\n':ps_com,
+                    'off\n':off_com,
+                    'cd':cd_com,
+                    'cat':cat_com}
 
-           #if dir:
-           # response = option[data](dir)
-           #else:
-           # response = option[data]()
+           try:
+               if dir:
+                   response = option[data](dir)
+               else:
+                   response = option[data]()
+           except:
+               response = ("No such Function\n")
 
            self.request.sendall(bytearray(response,"UTF-8"))
            print("%s (%s) wrote: %s" % (self.client_address[0],
