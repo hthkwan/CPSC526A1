@@ -3,6 +3,10 @@ import socketserver
 import socket, threading
 import subprocess
 
+def cat_com(fileName):
+    with open(fileName, "r") as myfile:
+        data = myfile.readlines()
+    return("\n".join(data)+"\n")
 
 def ls_com():
     resp = os.listdir(os.getcwd())
@@ -12,12 +16,11 @@ def pwd_com():
     resp = os.getcwd()
     return (resp+"\n")
 
-
+#assumed that the path is relative
 def cd_com(relPath):
     cwd=os.getcwd()
     path=os.chdir(os.path.join(cwd,relPath))
     return("dir changed"+"\n")
-
 
 def hlp_com():
     return ("pwd - returns current working directory\ncd <dir> - changes currentworking directory to <dir>\n"
@@ -44,6 +47,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                        data += self.request.recv(self.BUFFER_SIZE, socket.MSG_DONTWAIT)
                    except:
                        break
+           #add the password here
+
            if len(data) == 0:
                break
            data = data.decode( "utf-8")
@@ -54,14 +59,14 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
            except ValueError:
                print("\n")
 
-
            option = {'ls\n': ls_com,
                      'pwd\n': pwd_com,
                      'help\n': hlp_com,
                      'who\n':who_com,
                      'ps\n':ps_com,
                      'off\n':off_com,
-                     'cd':cd_com}
+                     'cd':cd_com,
+                     'cat':cat_com}
 
            if dir:
             response = option[data](dir)
