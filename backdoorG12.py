@@ -50,8 +50,8 @@ def who_com():
 def ps_com():
     return (subprocess.check_output(["/bin/ps"]).decode("utf-8")) #command must be located in /bin
 
-def net_com():
-    return (subprocess.check_output(["/sbin/ifconfig"]).decode("utf-8")) #command must be located in /sbin
+#def net_com():
+#    return (subprocess.check_output(["/sbin/ifconfig"]).decode("utf-8")) #command must be located in /sbin
 
 def off_com():
     return ("client disconnect\n")
@@ -124,8 +124,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                     'ps\n':ps_com,
                     'off\n':off_com,
                     'cd':cd_com,
-                    'cat':cat_com,
-                     'net\n':net_com}
+                    'cat':cat_com}
 
            #check the dictionary to see if the commmand exists and call the according function
            try:
@@ -148,6 +147,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 if __name__ == "__main__":
    HOST, PORT = "localhost", 9999
    server = socketserver.ThreadingTCPServer((HOST, PORT), MyTCPHandler)
-   server.serve_forever()
+   server.handle_request()
 
 
