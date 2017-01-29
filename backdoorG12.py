@@ -78,11 +78,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 			command = data.split() # splits on space and \n changed from previous method because it is inflexible
             #checks to see if the password has already been checked
 			if not authorized:
-				authorized = (data == password)
+				authorized = (command[0] == password)
 				if not authorized:
 					print(data)
 					##disconnect if password is not known
-					if (data == "off"):
+					if (command[0] == "off"):
 						print('bye')
 						break
 					self.request.sendall(bytearray(incorrectPw, "UTF-8"))
